@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Гибридная система управления библиотекой</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1><i class="fas fa-book"></i> Гибридная библиотечная система</h1>
+            <p class="subtitle">Интеграция Legacy (PHP/SOAP) и Modern (Node.js/REST) технологий</p>
+        </div>
+    </header>
+
+    <nav class="tabs">
+        <div class="container">
+            <button class="tab-button active" data-tab="physical-books">
+                <i class="fas fa-book-open"></i> Физические книги
+            </button>
+            <button class="tab-button" data-tab="digital-resources">
+                <i class="fas fa-laptop"></i> Цифровые ресурсы
+            </button>
+            <button class="tab-button" data-tab="admin-report">
+                <i class="fas fa-chart-bar"></i> Отчеты
+            </button>
+            <button class="tab-button" data-tab="system-info">
+                <i class="fas fa-info-circle"></i> О системе
+            </button>
+        </div>
+    </nav>
+
+    <main class="container">
+        <!-- Вкладка 1: Физические книги -->
+        <section id="physical-books" class="tab-content active">
+            <h2><i class="fas fa-search"></i> Поиск физических книг</h2>
+            <p class="tech-note"><i class="fas fa-code"></i> Технология: PHP SOAP → Node.js прокси → REST API</p>
+            
+            <div class="search-section">
+                <div class="search-box">
+                    <h3>Поиск по автору</h3>
+                    <div class="form-group">
+                        <input type="text" id="author-search" placeholder="Введите имя автора (например, Булгаков)" value="Булгаков">
+                        <button id="search-author-btn" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Найти книги
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="search-box">
+                    <h3>Поиск по инвентарному номеру</h3>
+                    <div class="form-group">
+                        <input type="text" id="inventory-search" placeholder="Введите инвентарный номер" value="LIB-2024-001">
+                        <button id="search-inventory-btn" class="btn btn-primary">
+                            <i class="fas fa-barcode"></i> Найти книгу
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="results-section">
+                <h3>Результаты поиска</h3>
+                <div class="loading" id="physical-loading" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>Запрос к SOAP серверу через Node.js...</p>
+                </div>
+                <div id="physical-results">
+                    <p class="empty-state">Результаты появятся здесь после поиска</p>
+                </div>
+            </div>
+            
+            <div class="loan-section">
+                <h3>Выдать книгу</h3>
+                <div class="form-group">
+                    <input type="text" id="loan-inventory" placeholder="Инвентарный номер" value="LIB-2024-002">
+                    <input type="text" id="loan-reader" placeholder="Номер читательского билета" value="R-99999">
+                    <button id="loan-btn" class="btn btn-success">
+                        <i class="fas fa-handshake"></i> Выдать книгу
+                    </button>
+                </div>
+                <div id="loan-result"></div>
+            </div>
+        </section>
+
+        <!-- Вкладка 2: Цифровые ресурсы -->
+        <section id="digital-resources" class="tab-content">
+            <h2><i class="fas fa-download"></i> Цифровые ресурсы</h2>
+            <p class="tech-note"><i class="fas fa-code"></i> Технология: Node.js + LowDB (JSON база данных)</p>
+            
+            <div class="controls">
+                <button id="load-digital-btn" class="btn btn-primary">
+                    <i class="fas fa-sync"></i> Загрузить ресурсы
+                </button>
+                <input type="text" id="digital-search" placeholder="Поиск по названию, автору или тегам" style="flex-grow: 1;">
+                <button id="search-digital-btn" class="btn btn-secondary">
+                    <i class="fas fa-search"></i> Искать
+                </button>
+            </div>
+            
+            <div class="loading" id="digital-loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Загрузка из JSON базы данных...</p>
+            </div>
+            
+            <div class="stats">
+                <div class="stat-card">
+                    <i class="fas fa-database"></i>
+                    <span id="resource-count">0</span>
+                    <small>ресурсов</small>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-download"></i>
+                    <span id="download-count">0</span>
+                    <small>скачиваний</small>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-users"></i>
+                    <span id="user-count">0</span>
+                    <small>пользователей</small>
+                </div>
+            </div>
+            
+            <div id="digital-results">
+                <div class="resource-grid">
+                    <!-- Ресурсы будут загружены динамически -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Вкладка 3: Админ отчеты -->
+        <section id="admin-report" class="tab-content">
+            <h2><i class="fas fa-chart-pie"></i> Административные отчеты</h2>
+            <p class="tech-note"><i class="fas fa-code"></i> Технология: PHP XML/XSLT → Node.js парсинг → REST API</p>
+            
+            <div class="report-controls">
+                <button class="report-btn active" data-report="overdue">
+                    <i class="fas fa-clock"></i> Просроченные книги
+                </button>
+                <button class="report-btn" data-report="popular">
+                    <i class="fas fa-star"></i> Популярные книги
+                </button>
+                <button class="report-btn" data-report="status">
+                    <i class="fas fa-tasks"></i> Статусы книг
+                </button>
+                <button class="report-btn" data-report="direct">
+                    <i class="fas fa-external-link-alt"></i> Прямой доступ (iframe)
+                </button>
+            </div>
+            
+            <div class="loading" id="report-loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Загрузка XML отчета из PHP системы...</p>
+            </div>
+            
+            <div id="report-results">
+                <div class="report-placeholder">
+                    <i class="fas fa-file-alt"></i>
+                    <h3>Выберите тип отчета</h3>
+                    <p>Нажмите на одну из кнопок выше для загрузки отчета</p>
+                </div>
+            </div>
+            
+            <div id="direct-report" style="display: none;">
+                <h3><i class="fas fa-external-link-square-alt"></i> Прямой доступ к PHP отчету (XSLT преобразование)</h3>
+                <iframe src="http://localhost:8000/php-legacy/report.php?type=overdue" 
+                        width="100%" 
+                        height="500" 
+                        frameborder="0"
+                        style="border: 1px solid #ddd; border-radius: 5px;">
+                </iframe>
+                <p class="note">Этот iframe показывает прямую работу XML/XSLT технологии из PHP системы</p>
+            </div>
+        </section>
+
+        <!-- Вкладка 4: Информация о системе -->
+        <section id="system-info" class="tab-content">
+            <h2><i class="fas fa-cogs"></i> Архитектура системы</h2>
+            
+            <div class="architecture">
+                <div class="arch-layer">
+                    <h3><i class="fas fa-desktop"></i> Фронтенд (HTML/CSS/JS)</h3>
+                    <p>Единый интерфейс для пользователей</p>
+                    <ul>
+                        <li>Vanilla JavaScript (без фреймворков)</li>
+                        <li>Адаптивный дизайн</li>
+                        <li>REST API запросы к Node.js</li>
+                    </ul>
+                </div>
+                
+                <div class="arch-arrow">↓</div>
+                
+                <div class="arch-layer">
+                    <h3><i class="fab fa-node-js"></i> Современный слой (Node.js)</h3>
+                    <p>API шлюз и управление цифровыми ресурсами</p>
+                    <ul>
+                        <li>Express.js REST API</li>
+                        <li>JSON база данных (LowDB)</li>
+                        <li>SOAP клиент для PHP</li>
+                        <li>XML парсинг отчетов</li>
+                    </ul>
+                </div>
+                
+                <div class="arch-arrow">↓</div>
+                
+                <div class="arch-layer">
+                    <h3><i class="fab fa-php"></i> Legacy слой (PHP)</h3>
+                    <p>Управление физическими книгами</p>
+                    <ul>
+                        <li>SOAP сервер с WSDL</li>
+                        <li>SQLite база данных</li>
+                        <li>XML/XSLT отчеты</li>
+                        <li>Админ панель</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="tech-grid">
+                <div class="tech-card">
+                    <h4><i class="fas fa-plug"></i> Интеграционные точки</h4>
+                    <ul>
+                        <li><code>GET /api/physical/books</code> - SOAP прокси</li>
+                        <li><code>POST /api/physical/loan</code> - SOAP вызов</li>
+                        <li><code>GET /api/internal/overdue-report</code> - XML парсинг</li>
+                    </ul>
+                </div>
+                
+                <div class="tech-card">
+                    <h4><i class="fas fa-database"></i> Базы данных</h4>
+                    <ul>
+                        <li>SQLite (физические книги)</li>
+                        <li>JSON файл (цифровые ресурсы)</li>
+                        <li>Раздельное хранение данных</li>
+                    </ul>
+                </div>
+                
+                <div class="tech-card">
+                    <h4><i class="fas fa-exchange-alt"></i> Протоколы</h4>
+                    <ul>
+                        <li>REST (Node.js → Frontend)</li>
+                        <li>SOAP (Node.js → PHP)</li>
+                        <li>XML/XSLT (PHP отчеты)</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <button id="system-check-btn" class="btn btn-info">
+                <i class="fas fa-heartbeat"></i> Проверить состояние системы
+            </button>
+            <div id="system-status"></div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>Практическая работа: "Гибридная система управления библиотекой (Legacy + Modern)"</p>
+            <p class="tech-stack">
+                <span class="tech-tag">PHP 8.4</span>
+                <span class="tech-tag">SOAP</span>
+                <span class="tech-tag">XML/XSLT</span>
+                <span class="tech-tag">Node.js</span>
+                <span class="tech-tag">Express</span>
+                <span class="tech-tag">REST API</span>
+                <span class="tech-tag">SQLite</span>
+            </p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
