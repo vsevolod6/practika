@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест SOAP клиента</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .section { margin-bottom: 30px; padding: 15px; border: 1px solid #ccc; }
+        button { margin: 5px; padding: 8px 15px; }
+        pre { background: #f5f5f5; padding: 10px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Тестовый SOAP клиент для библиотеки</h1>
+    
+    <div class="section">
+        <h2>1. Получить книгу по инвентарному номеру</h2>
+        <input type="text" id="inventoryNumber" value="LIB-2024-001" placeholder="Инвентарный номер">
+        <button onclick="getBook()">Получить книгу</button>
+        <pre id="result1">Результат появится здесь</pre>
+    </div>
+    
+    <div class="section">
+        <h2>2. Поиск книг по автору</h2>
+        <input type="text" id="authorName" value="Булгаков" placeholder="Имя автора">
+        <button onclick="searchBooks()">Искать книги</button>
+        <pre id="result2">Результат появится здесь</pre>
+    </div>
+    
+    <div class="section">
+        <h2>3. Выдать книгу</h2>
+        <input type="text" id="loanInventory" value="LIB-2024-002" placeholder="Инвентарный номер">
+        <input type="text" id="readerCard" value="R-99999" placeholder="Номер читательского">
+        <button onclick="registerLoan()">Выдать книгу</button>
+        <pre id="result3">Результат появится здесь</pre>
+    </div>
+    
+    <script>
+        const soapUrl = 'soap-server.php';
+        
+        async function callSoap(method, params) {
+            try {
+                const response = await fetch(soapUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'text/xml; charset=utf-8',
+                        'SOAPAction': method
+                    },
+                    body: createSoapRequest(method, params)
+                });
+                
+                const text = await response.text();
+                return text;
+            } catch (error) {
+                return 'Ошибка: ' + error.message;
+            }
+        }
+        
+        function createSoapRequest(method, params) {
+            let soapBody = '';
+            
+            if (method === 'getBookByInventory') {
+                soapBody = `
+                    <getBookByInventory>
+                        <inventory_number>${params.inventory_number}</inventory_number>
+                    </getBookByInventory>
+                `;
+            } else if (method === 'searchBooksByAuthor') {
+                soapBody = `
+                    <searchBooksByAuthor>
+                        <author_name>${params.author_name}</author_name>
+                    </searchBooksByAuthor>
+                `;
+            } else if (method === 'registerLoan') {
+                soapBody = `
+                    <registerLoan>
+                        <inventory_number>${params.inventory_number}</inventory_number>
+                        <reader_card>${params.reader_card}</reader_card>
+                    </registerLoan>
+                `;
+            }
+            
+            return `<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" 
+                   xmlns:ns1="http://localhost:8000/php-legacy/soap-server.php">
+    <SOAP-ENV:Body>
+        ${soapBody}
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>`;
+        }
+        
+        async function getBook() {
+            const inventory = document.getElementById('inventoryNumber').value;
+            const result = await callSoap('getBookByInventory', { inventory_number: inventory });
+            document.getElementById('result1').textContent = result;
+        }
+        
+        async function searchBooks() {
+            const author = document.getElementById('authorName').value;
+            const result = await callSoap('searchBooksByAuthor', { author_name: author });
+            document.getElementById('result2').textContent = result;
+        }
+        
+        async function registerLoan() {
+            const inventory = document.getElementById('loanInventory').value;
+            const reader = document.getElementById('readerCard').value;
+            const result = await callSoap('registerLoan', { 
+                inventory_number: inventory, 
+                reader_card: reader 
+            });
+            document.getElementById('result3').textContent = result;
+        }
+    </script>
+</body>
+</html>
