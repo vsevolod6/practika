@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions name="LibraryService"
+    targetNamespace="http://localhost/php-legacy/library.wsdl"
+    xmlns="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:tns="http://localhost/php-legacy/library.wsdl"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    
+    <types>
+        <xsd:schema targetNamespace="http://localhost/php-legacy/library.wsdl">
+            <!-- Простые типы -->
+        </xsd:schema>
+    </types>
+    
+    <!-- Сообщения -->
+    <message name="getBookByInventoryRequest">
+        <part name="inventory_number" type="xsd:string"/>
+    </message>
+    <message name="getBookByInventoryResponse">
+        <part name="return" type="xsd:string"/>
+    </message>
+    
+    <message name="searchBooksByAuthorRequest">
+        <part name="author_name" type="xsd:string"/>
+    </message>
+    <message name="searchBooksByAuthorResponse">
+        <part name="return" type="xsd:string"/>
+    </message>
+    
+    <message name="registerLoanRequest">
+        <part name="inventory_number" type="xsd:string"/>
+        <part name="reader_card" type="xsd:string"/>
+    </message>
+    <message name="registerLoanResponse">
+        <part name="return" type="xsd:string"/>
+    </message>
+    
+    <!-- Порт -->
+    <portType name="LibraryPortType">
+        <operation name="getBookByInventory">
+            <input message="tns:getBookByInventoryRequest"/>
+            <output message="tns:getBookByInventoryResponse"/>
+        </operation>
+        <operation name="searchBooksByAuthor">
+            <input message="tns:searchBooksByAuthorRequest"/>
+            <output message="tns:searchBooksByAuthorResponse"/>
+        </operation>
+        <operation name="registerLoan">
+            <input message="tns:registerLoanRequest"/>
+            <output message="tns:registerLoanResponse"/>
+        </operation>
+    </portType>
+    
+    <!-- Привязка -->
+    <binding name="LibraryBinding" type="tns:LibraryPortType">
+        <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <operation name="getBookByInventory">
+            <soap:operation soapAction="getBookByInventory"/>
+            <input>
+                <soap:body use="literal" namespace="http://localhost/php-legacy/library.wsdl"/>
+            </input>
+            <output>
+                <soap:body use="literal" namespace="http://localhost/php-legacy/library.wsdl"/>
+            </output>
+        </operation>
+        <operation name="searchBooksByAuthor">
+            <soap:operation soapAction="searchBooksByAuthor"/>
+            <input>
+                <soap:body use="literal" namespace="http://localhost/php-legacy/library.wsdl"/>
+            </input>
+            <output>
+                <soap:body use="literal" namespace="http://localhost/php-legacy/library.wsdl"/>
+            </output>
+        </operation>
+        <operation name="registerLoan">
+            <soap:operation soapAction="registerLoan"/>
+            <input>
+                <soap:body use="literal" namespace="http://localhost/php-legacy/library.wsdl"/>
+            </input>
+            <output>
+                <soap:body use="literal" namespace="http://localhost/php-legacy/library.wsdl"/>
+            </output>
+        </operation>
+    </binding>
+    
+    <!-- Сервис -->
+    <service name="LibraryService">
+        <port name="LibraryPort" binding="tns:LibraryBinding">
+            <soap:address location="http://localhost:8000/php-legacy/soap-server.php"/>
+        </port>
+    </service>
+</definitions>
