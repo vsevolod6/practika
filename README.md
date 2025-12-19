@@ -22,7 +22,7 @@ cd databases
 sqlite3 library.db < ../php-legacy/database/init.sql
 sqlite3 library.db < ../php-legacy/database/add_test_data.sql
 sqlite3 library.db < ../php-legacy/database/add_more_books.sql
-sqlite3 library.db < ../php-legacy/database/add_more_loans.sql
+
 
 
 ### Настройка Node.js части
