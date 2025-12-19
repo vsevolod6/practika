@@ -16,6 +16,7 @@
 ### Настройка PHP части
 
 Инициализируйте базу данных SQLite:
+
 cd databases
 sqlite3 library.db < ../php-legacy/database/init.sql
 sqlite3 library.db < ../php-legacy/database/add_test_data.sql
@@ -26,6 +27,7 @@ sqlite3 library.db < ../php-legacy/database/add_more_loans.sql
 ### Настройка Node.js части
 
 cd node-modern
+
 npm install
 
 
@@ -33,19 +35,25 @@ npm install
 ### Запуск системы
 
 Терминал 1: PHP сервер
+
 cd папка проекта
+
 php -S localhost:8000
 
 
 
 Терминал 2: Node.js сервер
+
 cd node-modern
+
 npm start
 
 
 
 Терминал 3: Фронтенд (опционально)
+
 cd frontend
+
 php -S localhost:8080
 
 
